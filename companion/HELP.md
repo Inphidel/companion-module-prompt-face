@@ -14,6 +14,8 @@ Hold emote shows the text in the button action while the key is held, then clear
 
 Toggle emote uses the same kind of text field. The face stays until you press the key again. The key is amber while that face is on screen, and dark while it is not. Edit the Face text on the action. The label on the key can stay a short name.
 
+Hat A, Hat B, Hat C, Hat D, and Hat Off choose the separate hat picture. The key turns blue while that slot is in use. The pictures are configured on the Prompt expression page.
+
 ## Variables
 
-`line` is the face text. `muted`, `mouth`, `hearing`, `mode`, `expression`, and `connected` follow the command port.
+`line` is the face text. `muted`, `mouth`, `hearing`, `mode`, `expression`, `hat`, and `connected` follow the command port.

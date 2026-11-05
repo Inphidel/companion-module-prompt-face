@@ -34,6 +34,7 @@ class PromptFace extends InstanceBase {
 			mode: 'live',
 			expression: 'closed',
 			line: '',
+			hat: 'none',
 			connected: 'no',
 		}
 	}
@@ -152,7 +153,7 @@ class PromptFace extends InstanceBase {
 		}
 		if (!parsed.ok) return
 		const next = {}
-		for (const key of ['mouth', 'hearing', 'muted', 'mode', 'expression', 'line']) {
+		for (const key of ['mouth', 'hearing', 'muted', 'mode', 'expression', 'hat', 'line']) {
 			if (parsed[key] !== undefined) next[key] = parsed[key]
 		}
 		if (next.expression && !EXPRESSION.has(next.expression)) next.expression = 'closed'
@@ -239,6 +240,26 @@ class PromptFace extends InstanceBase {
 					if (text.trim()) this.send(`emote ${text}`)
 				},
 			},
+			hat: {
+				name: 'Hat',
+				description: 'Shows one saved hat picture, or hides the hat',
+				options: [
+					{
+						type: 'dropdown',
+						id: 'slot',
+						label: 'Hat',
+						default: 'none',
+						choices: [
+							{ id: 'a', label: 'A' },
+							{ id: 'b', label: 'B' },
+							{ id: 'c', label: 'C' },
+							{ id: 'd', label: 'D' },
+							{ id: 'none', label: 'None' },
+						],
+					},
+				],
+				callback: (action) => this.send(`hat ${action.options.slot || 'none'}`),
+			},
 			clear: {
 				name: 'Clear emote',
 				options: [],
@@ -297,6 +318,32 @@ class PromptFace extends InstanceBase {
 						text: on ? 'Mute on' : 'Mute off',
 					}
 				},
+			},
+			hat: {
+				type: 'boolean',
+				name: 'Hat slot',
+				description: 'Lights while this hat slot is the one in use',
+				defaultStyle: {
+					bgcolor: combineRgb(36, 92, 160),
+					color: combineRgb(255, 255, 255),
+				},
+				options: [
+					{
+						type: 'dropdown',
+						id: 'slot',
+						label: 'Hat',
+						default: 'none',
+						choices: [
+							{ id: 'a', label: 'A' },
+							{ id: 'b', label: 'B' },
+							{ id: 'c', label: 'C' },
+							{ id: 'd', label: 'D' },
+							{ id: 'none', label: 'None' },
+						],
+					},
+				],
+				callback: (feedback) =>
+					this.state.connected === 'yes' && this.state.hat === (feedback.options.slot || 'none'),
 			},
 			emote_toggle: {
 				type: 'advanced',
@@ -361,6 +408,7 @@ class PromptFace extends InstanceBase {
 			{ variableId: 'hearing', name: 'Capture open' },
 			{ variableId: 'mode', name: 'live or emote' },
 			{ variableId: 'expression', name: 'Mouth expression' },
+			{ variableId: 'hat', name: 'Hat slot' },
 			{ variableId: 'connected', name: 'Command port connected' },
 		])
 		this.setVariableValues(this.state)
@@ -374,6 +422,14 @@ class PromptFace extends InstanceBase {
 			bgcolor: combineRgb(20, 22, 16),
 			alignment: 'center:center',
 		}
+		const hatPreset = (label, slot) => ({
+			type: 'button',
+			category: 'Prompt',
+			name: `Hat ${label}`,
+			style: { ...face, text: `Hat ${label}` },
+			steps: [{ down: [{ actionId: 'hat', options: { slot } }], up: [] }],
+			feedbacks: [{ feedbackId: 'hat', options: { slot } }],
+		})
 		this.setPresetDefinitions({
 			mute: {
 				type: 'button',
@@ -409,6 +465,11 @@ class PromptFace extends InstanceBase {
 				],
 				feedbacks: [],
 			},
+			hat_a: hatPreset('A', 'a'),
+			hat_b: hatPreset('B', 'b'),
+			hat_c: hatPreset('C', 'c'),
+			hat_d: hatPreset('D', 'd'),
+			hat_none: hatPreset('Off', 'none'),
 			toggle: {
 				type: 'button',
 				category: 'Prompt',
