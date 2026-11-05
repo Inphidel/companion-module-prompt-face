@@ -29,7 +29,7 @@ class PromptFace extends InstanceBase {
 		this.state = {
 			mouth: 'jaw',
 			hearing: 'no',
-			muted: 'no',
+			muted: 'off',
 			mode: 'live',
 			expression: 'closed',
 			line: '',
@@ -165,7 +165,7 @@ class PromptFace extends InstanceBase {
 	}
 
 	imageKey() {
-		if (this.state.muted === 'yes') return 'muted'
+		if (this.state.muted === 'on') return 'muted'
 		if (this.state.mode === 'emote') return 'emote'
 		if (this.state.expression === 'open' || this.state.expression === 'wide') return 'talk'
 		return 'live'
@@ -249,14 +249,25 @@ class PromptFace extends InstanceBase {
 	updateFeedbacks() {
 		this.setFeedbackDefinitions({
 			muted: {
-				type: 'boolean',
-				name: 'Muted',
-				defaultStyle: {
-					bgcolor: combineRgb(140, 20, 20),
-					color: combineRgb(255, 255, 255),
-				},
+				type: 'advanced',
+				name: 'Mute state',
+				description: 'Green while the face mute is off, red while it is on. The words come from the connection.',
 				options: [],
-				callback: () => this.state.muted === 'yes',
+				callback: () => {
+					if (this.state.connected !== 'yes') {
+						return {
+							bgcolor: combineRgb(40, 42, 36),
+							color: combineRgb(180, 180, 170),
+							text: 'Mute',
+						}
+					}
+					const on = this.state.muted === 'on'
+					return {
+						bgcolor: on ? combineRgb(140, 20, 20) : combineRgb(24, 120, 48),
+						color: combineRgb(255, 255, 255),
+						text: on ? 'Mute on' : 'Mute off',
+					}
+				},
 			},
 			show_prompt: {
 				type: 'advanced',
@@ -292,7 +303,7 @@ class PromptFace extends InstanceBase {
 	updateVariableDefinitions() {
 		this.setVariableDefinitions([
 			{ variableId: 'line', name: 'Face line' },
-			{ variableId: 'muted', name: 'Muted yes or no' },
+			{ variableId: 'muted', name: 'Face mute on or off' },
 			{ variableId: 'mouth', name: 'Mouth source' },
 			{ variableId: 'hearing', name: 'Capture open' },
 			{ variableId: 'mode', name: 'live or emote' },

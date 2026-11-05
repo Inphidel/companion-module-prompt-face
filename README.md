@@ -2,7 +2,7 @@
 
 Stream Deck buttons for [Prompt Face](https://github.com/Inphidel/prompt-face). Companion talks to the command port on the computer that is running the face. The buttons are presets, so they replace a raw TCP action.
 
-Mute silences the microphone Prompt Face and OBS are sharing. The Prompt button shows the live face text. Hold emote has a text field: the face shows while the key is down and clears when the key comes up.
+Mute sets the Prompt Face mute flag. It does not silence the microphone. The face computer paints the muted face and sends `muted=on` or `muted=off` so OBS Advanced Scene Switcher can mute the audio source. The Mute key is green while the flag is off and red while it is on, and the text on the key says which. The Prompt button shows the live face text. Hold emote has a text field: the face shows while the key is down and clears when the key comes up.
 
 ## What you need
 
@@ -35,7 +35,7 @@ On the connection, each state can point at a PNG on the Stream Deck computer:
 - Live image, when the camera face is showing and the mouth is closed
 - Talking image, when the mouth is open or wide
 - Emote image, while a custom face is holding
-- Muted image, while the microphone is muted
+- Muted image, while the face mute is on
 
 The Prompt preset uses those pictures. An empty path leaves the face text on the key. The text is the whole line, and a long emote is cut off by the key.
 

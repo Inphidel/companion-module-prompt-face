@@ -6,7 +6,7 @@ Set the face computer address and port 8772. A token is only needed when Prompt 
 
 ## Presets
 
-Mute toggles the microphone mute. The key turns red while the mute is on.
+Mute tells Prompt Face to set its mute flag. Prompt Face does not silence the microphone. It paints the muted face and sends `muted=on` or `muted=off` to OBS, where a macro can mute the audio source. The key is green while that flag is off and red while it is on. The words on the key are `Mute off` and `Mute on`. Gray means the connection is down.
 
 Prompt shows the face that is on screen. State images, set on the connection, replace the button picture for live, talking, emote, and muted. Leave a path empty and that state keeps the text.
 
