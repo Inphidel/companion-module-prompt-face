@@ -1,0 +1,26 @@
+{
+  "id": "prompt-face",
+  "name": "Prompt Face",
+  "shortname": "Prompt",
+  "description": "Buttons for a Prompt Face: mute, hold an emote, and show the live line",
+  "manufacturer": "Prompt Face",
+  "products": ["Prompt Face"],
+  "keywords": ["obs", "face", "emote"],
+  "version": "1.0.0",
+  "license": "MIT",
+  "repository": "git+https://github.com/Inphidel/companion-module-prompt-face.git",
+  "bugs": "https://github.com/Inphidel/companion-module-prompt-face/issues",
+  "maintainers": [
+    {
+      "name": "Brian Edward",
+      "email": "inph1del@yahoo.com"
+    }
+  ],
+  "legacyIds": [],
+  "runtime": {
+    "type": "node18",
+    "api": "nodejs-ipc",
+    "apiVersion": "0.0.0",
+    "entrypoint": "../main.js"
+  }
+}
