@@ -26,6 +26,7 @@ class PromptFace extends InstanceBase {
 		this.buffer = ''
 		this.connected = false
 		this.images = {}
+		this.emoteText = new Map()
 		this.state = {
 			mouth: 'jaw',
 			hearing: 'no',
@@ -243,6 +244,34 @@ class PromptFace extends InstanceBase {
 				options: [],
 				callback: () => this.send('clear'),
 			},
+			emote_toggle: {
+				name: 'Toggle emote',
+				description: 'Shows this face until the key is pressed again',
+				options: [
+					{
+						type: 'textinput',
+						id: 'text',
+						label: 'Face text',
+						default: '',
+						useVariables: true,
+					},
+				],
+				optionsToMonitorForSubscribe: ['text'],
+				subscribe: (action) => {
+					this.emoteText.set(action.controlId, action.options.text || '')
+					this.checkFeedbacks('emote_toggle')
+				},
+				unsubscribe: (action) => {
+					this.emoteText.delete(action.controlId)
+					this.checkFeedbacks('emote_toggle')
+				},
+				callback: async (action, context) => {
+					const text = await context.parseVariablesInString(action.options.text || '')
+					if (!text.trim()) return
+					this.emoteText.set(action.controlId, text)
+					this.send(`emote toggle ${text}`)
+				},
+			},
 		})
 	}
 
@@ -266,6 +295,30 @@ class PromptFace extends InstanceBase {
 						bgcolor: on ? combineRgb(140, 20, 20) : combineRgb(24, 120, 48),
 						color: combineRgb(255, 255, 255),
 						text: on ? 'Mute on' : 'Mute off',
+					}
+				},
+			},
+			emote_toggle: {
+				type: 'advanced',
+				name: 'Toggle emote',
+				description: 'Highlights the key while this button’s face is on screen',
+				options: [],
+				callback: (feedback) => {
+					const text = this.emoteText.get(feedback.controlId) || ''
+					const on =
+						this.state.connected === 'yes' &&
+						!!text.trim() &&
+						this.state.mode === 'emote' &&
+						this.state.line === text
+					if (this.state.connected !== 'yes') {
+						return {
+							bgcolor: combineRgb(40, 42, 36),
+							color: combineRgb(180, 180, 170),
+						}
+					}
+					return {
+						bgcolor: on ? combineRgb(176, 122, 24) : combineRgb(20, 22, 16),
+						color: combineRgb(255, 255, 255),
 					}
 				},
 			},
@@ -355,6 +408,14 @@ class PromptFace extends InstanceBase {
 					},
 				],
 				feedbacks: [],
+			},
+			toggle: {
+				type: 'button',
+				category: 'Prompt',
+				name: 'Toggle emote',
+				style: { ...face, text: 'Emote' },
+				steps: [{ down: [{ actionId: 'emote_toggle', options: { text: '' } }], up: [] }],
+				feedbacks: [{ feedbackId: 'emote_toggle', options: {} }],
 			},
 		})
 	}

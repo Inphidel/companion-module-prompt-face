@@ -1,6 +1,6 @@
 {
   "name": "companion-module-prompt-face",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Bitfocus Companion buttons for a Prompt Face",
   "main": "main.js",
   "license": "MIT",

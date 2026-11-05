@@ -12,6 +12,8 @@ Prompt shows the face that is on screen. State images, set on the connection, re
 
 Hold emote shows the text in the button action while the key is held, then clears it on release. Edit that text field for each face.
 
+Toggle emote uses the same kind of text field. The face stays until you press the key again. The key is amber while that face is on screen, and dark while it is not. Edit the Face text on the action. The label on the key can stay a short name.
+
 ## Variables
 
 `line` is the face text. `muted`, `mouth`, `hearing`, `mode`, `expression`, and `connected` follow the command port.
