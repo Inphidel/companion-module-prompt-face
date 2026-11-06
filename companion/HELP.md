@@ -10,9 +10,9 @@ Mute tells Prompt Face to set its mute flag. Prompt Face does not silence the mi
 
 Prompt shows the face that is on screen. State images, set on the connection, replace the button picture for live, talking, emote, and muted. Leave a path empty and that state keeps the text.
 
-Hold emote shows the text in the button action while the key is held, then clears it on release. Edit that text field for each face.
+Hold emote and Toggle emote look the same. Type the face in Face text. That text is the title on the key. Hold shows it while the key is down, then clears it on release. Toggle keeps it until you press the key again. The key is amber while that face is on screen. Title font size is on the Emote title feedback. A long title stays on one line and the rest is cut off. Untick Show the face text as the key title if you want different words in Button text.
 
-Toggle emote uses the same kind of text field. The face stays until you press the key again. The key is amber while that face is on screen, and dark while it is not. Edit the Face text on the action. The label on the key can stay a short name.
+Prompt shows the live face on one line. Font size is on the Show the prompt feedback. A long face is cut off instead of wrapping.
 
 Hat A, Hat B, Hat C, Hat D, and Hat Off choose the separate hat picture. The key turns blue while that slot is in use. The pictures are configured on the Prompt expression page.
 

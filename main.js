@@ -3,6 +3,22 @@ const { InstanceBase, Regex, runEntrypoint, InstanceStatus, TCPHelper, combineRg
 
 const EXPRESSION = new Set(['closed', 'open', 'wide'])
 
+function fontSize(value) {
+	const number = Number(value)
+	if (!Number.isFinite(number)) return 14
+	return Math.min(44, Math.max(7, Math.round(number)))
+}
+
+// Companion wraps at spaces once a line is wider than the key, then draws a
+// second line when the type is small. Cut the string so one line is all that fits.
+function oneLine(text, size) {
+	const flat = Array.from(String(text || '').replace(/[\r\n]/g, ''))
+	if (flat.length === 0) return ' '
+	const px = fontSize(size)
+	const maxChars = Math.max(1, Math.floor(68 / Math.max(px * 0.68, 6)))
+	return flat.slice(0, maxChars).join('')
+}
+
 function parseReply(line) {
 	const parsed = { ok: line.startsWith('ok '), error: line.startsWith('err ') ? line.slice(4) : '' }
 	let body = line
@@ -226,6 +242,7 @@ class PromptFace extends InstanceBase {
 			},
 			emote: {
 				name: 'Show emote',
+				description: 'Shows this face while the key is held. The same text can be the title on the key.',
 				options: [
 					{
 						type: 'textinput',
@@ -235,9 +252,20 @@ class PromptFace extends InstanceBase {
 						useVariables: true,
 					},
 				],
+				optionsToMonitorForSubscribe: ['text'],
+				subscribe: (action) => {
+					this.emoteText.set(action.controlId, action.options.text || '')
+					this.checkFeedbacks('emote_toggle')
+				},
+				unsubscribe: (action) => {
+					this.emoteText.delete(action.controlId)
+					this.checkFeedbacks('emote_toggle')
+				},
 				callback: async (action, context) => {
 					const text = await context.parseVariablesInString(action.options.text || '')
-					if (text.trim()) this.send(`emote ${text}`)
+					if (!text.trim()) return
+					this.emoteText.set(action.controlId, text)
+					this.send(`emote ${text}`)
 				},
 			},
 			hat: {
@@ -267,7 +295,7 @@ class PromptFace extends InstanceBase {
 			},
 			emote_toggle: {
 				name: 'Toggle emote',
-				description: 'Shows this face until the key is pressed again',
+				description: 'Shows this face until the key is pressed again. The same text can be the title on the key.',
 				options: [
 					{
 						type: 'textinput',
@@ -347,38 +375,67 @@ class PromptFace extends InstanceBase {
 			},
 			emote_toggle: {
 				type: 'advanced',
-				name: 'Toggle emote',
-				description: 'Highlights the key while this button’s face is on screen',
-				options: [],
+				name: 'Emote title',
+				description: 'Lights while this key’s face is on screen. The title can be that same face, on one line.',
+				affectedProperties: ['bgcolor', 'color', 'text', 'size'],
+				options: [
+					{
+						type: 'checkbox',
+						id: 'show_title',
+						label: 'Show the face text as the key title',
+						default: true,
+					},
+					{
+						type: 'number',
+						id: 'size',
+						label: 'Title font size',
+						default: 14,
+						min: 7,
+						max: 44,
+					},
+				],
 				callback: (feedback) => {
-					const text = this.emoteText.get(feedback.controlId) || ''
+					const stored = this.emoteText.get(feedback.controlId) || ''
 					const on =
 						this.state.connected === 'yes' &&
-						!!text.trim() &&
+						!!stored.trim() &&
 						this.state.mode === 'emote' &&
-						this.state.line === text
+						this.state.line === stored
+					const style = {}
 					if (this.state.connected !== 'yes') {
-						return {
-							bgcolor: combineRgb(40, 42, 36),
-							color: combineRgb(180, 180, 170),
-						}
+						style.bgcolor = combineRgb(40, 42, 36)
+						style.color = combineRgb(180, 180, 170)
+					} else {
+						style.bgcolor = on ? combineRgb(176, 122, 24) : combineRgb(20, 22, 16)
+						style.color = combineRgb(255, 255, 255)
 					}
-					return {
-						bgcolor: on ? combineRgb(176, 122, 24) : combineRgb(20, 22, 16),
-						color: combineRgb(255, 255, 255),
+					if (feedback.options.show_title && stored.trim()) {
+						const size = fontSize(feedback.options.size)
+						style.text = oneLine(stored, size)
+						style.size = String(size)
 					}
+					return style
 				},
 			},
 			show_prompt: {
 				type: 'advanced',
 				name: 'Show the prompt',
-				description: 'Puts the live face on the button, and the state image when one is set',
+				description: 'Puts the live face on the button, on one line. Extra characters are cut off.',
+				affectedProperties: ['text', 'size', 'png64'],
 				options: [
 					{
 						type: 'checkbox',
 						id: 'show_line',
 						label: 'Show the live face text',
 						default: true,
+					},
+					{
+						type: 'number',
+						id: 'size',
+						label: 'Font size',
+						default: 14,
+						min: 7,
+						max: 44,
 					},
 					{
 						type: 'checkbox',
@@ -389,7 +446,11 @@ class PromptFace extends InstanceBase {
 				],
 				callback: (feedback) => {
 					const style = {}
-					if (feedback.options.show_line) style.text = this.state.line || ' '
+					if (feedback.options.show_line) {
+						const size = fontSize(feedback.options.size)
+						style.text = oneLine(this.state.line || ' ', size)
+						style.size = String(size)
+					}
 					if (feedback.options.use_images) {
 						const png = this.imageFor(this.imageKey())
 						if (png) style.png64 = png
@@ -443,12 +504,12 @@ class PromptFace extends InstanceBase {
 				type: 'button',
 				category: 'Prompt',
 				name: 'Prompt',
-				style: { ...face, text: 'Prompt', size: '7' },
+				style: { ...face, text: 'Prompt', size: '14' },
 				steps: [{ down: [], up: [] }],
 				feedbacks: [
 					{
 						feedbackId: 'show_prompt',
-						options: { show_line: true, use_images: true },
+						options: { show_line: true, use_images: true, size: 14 },
 					},
 				],
 			},
@@ -456,14 +517,14 @@ class PromptFace extends InstanceBase {
 				type: 'button',
 				category: 'Prompt',
 				name: 'Hold emote',
-				style: { ...face, text: 'Emote' },
+				style: { ...face, text: 'Emote', size: '14' },
 				steps: [
 					{
 						down: [{ actionId: 'emote', options: { text: '' } }],
 						up: [{ actionId: 'clear', options: {} }],
 					},
 				],
-				feedbacks: [],
+				feedbacks: [{ feedbackId: 'emote_toggle', options: { show_title: true, size: 14 } }],
 			},
 			hat_a: hatPreset('A', 'a'),
 			hat_b: hatPreset('B', 'b'),
@@ -474,9 +535,9 @@ class PromptFace extends InstanceBase {
 				type: 'button',
 				category: 'Prompt',
 				name: 'Toggle emote',
-				style: { ...face, text: 'Emote' },
+				style: { ...face, text: 'Emote', size: '14' },
 				steps: [{ down: [{ actionId: 'emote_toggle', options: { text: '' } }], up: [] }],
-				feedbacks: [{ feedbackId: 'emote_toggle', options: {} }],
+				feedbacks: [{ feedbackId: 'emote_toggle', options: { show_title: true, size: 14 } }],
 			},
 		})
 	}
