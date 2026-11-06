@@ -2,7 +2,7 @@
 
 Stream Deck buttons for [Prompt Face](https://github.com/Inphidel/prompt-face). Companion talks to the command port on the computer that is running the face. The buttons are presets, so they replace a raw TCP action.
 
-Mute sets the Prompt Face mute flag. It does not silence the microphone. The face computer paints the muted face and sends `muted=on` or `muted=off` so OBS Advanced Scene Switcher can mute the audio source. The Mute key is green while the flag is off and red while it is on, and the text on the key says which. The Prompt button shows the live face on one line. Hold emote and Toggle emote share one Face text field, and that text is the title on the key. Hold shows the face while the key is down. Toggle keeps it until the next press. The key turns amber while its face is the one on screen. Hat A through Hat H, and Hat Off, switch the separate text hat. The selected key turns blue.
+Mute sets the Prompt Face mute flag. It does not silence the microphone. The face computer paints the muted face and sends `muted=on` or `muted=off` so OBS Advanced Scene Switcher can mute the audio source. The Mute key is green while the flag is off and red while it is on, and the text on the key says which. Mouth toggles the mouth between the camera jaw and the microphone. The key says `Jaw` or `Audio`. The Prompt button shows the live face on one line. Hold emote and Toggle emote share one Face text field, and that text is the title on the key. Hold shows the face while the key is down. Toggle keeps it until the next press. The key turns amber while its face is the one on screen. Hat A through Hat H, and Hat Off, switch the separate text hat. The selected key turns blue.
 
 ## What you need
 
@@ -43,6 +43,7 @@ The Prompt preset uses those pictures. An empty path leaves the face text on the
 
 ```text
 mute toggle
+mouth toggle
 emote TEXT
 emote toggle TEXT
 clear
@@ -50,6 +51,8 @@ hat a
 hat none
 status
 ```
+
+`mouth toggle` switches the mouth between the jaw and the microphone. `mouth jaw` and `mouth sound` set one side. Audio does not mute the stream.
 
 `hat a` through `hat h` show a text hat saved on the expression page. `hat none` hides it. Each hat has a left, a center, and a right. The look picks the side. Prompt's text face stays as it is, including arms and hand gestures.
 

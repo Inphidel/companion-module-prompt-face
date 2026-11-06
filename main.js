@@ -240,8 +240,8 @@ class PromptFace extends InstanceBase {
 						label: 'Source',
 						default: 'toggle',
 						choices: [
-							{ id: 'toggle', label: 'Toggle jaw and sound' },
-							{ id: 'sound', label: 'Sound' },
+							{ id: 'toggle', label: 'Toggle jaw and audio' },
+							{ id: 'sound', label: 'Audio' },
 							{ id: 'jaw', label: 'Jaw' },
 						],
 					},
@@ -328,6 +328,27 @@ class PromptFace extends InstanceBase {
 
 	updateFeedbacks() {
 		this.setFeedbackDefinitions({
+			mouth: {
+				type: 'advanced',
+				name: 'Mouth source',
+				description: 'Shows Jaw while the camera drives the mouth, and Audio while the microphone does.',
+				options: [],
+				callback: () => {
+					if (this.state.connected !== 'yes') {
+						return {
+							bgcolor: combineRgb(40, 42, 36),
+							color: combineRgb(180, 180, 170),
+							text: 'Mouth',
+						}
+					}
+					const audio = this.state.mouth === 'sound'
+					return {
+						bgcolor: audio ? combineRgb(176, 122, 24) : combineRgb(36, 78, 112),
+						color: combineRgb(255, 255, 255),
+						text: audio ? 'Audio' : 'Jaw',
+					}
+				},
+			},
 			muted: {
 				type: 'advanced',
 				name: 'Mute state',
@@ -495,6 +516,14 @@ class PromptFace extends InstanceBase {
 				style: { ...face, text: 'Mute' },
 				steps: [{ down: [{ actionId: 'mute', options: { mode: 'toggle' } }], up: [] }],
 				feedbacks: [{ feedbackId: 'muted', options: {} }],
+			},
+			mouth: {
+				type: 'button',
+				category: 'Prompt',
+				name: 'Mouth',
+				style: { ...face, text: 'Mouth' },
+				steps: [{ down: [{ actionId: 'mouth', options: { mode: 'toggle' } }], up: [] }],
+				feedbacks: [{ feedbackId: 'mouth', options: {} }],
 			},
 			prompt: {
 				type: 'button',

@@ -8,6 +8,8 @@ Set the face computer address and port 8772. A token is only needed when Prompt 
 
 Mute tells Prompt Face to set its mute flag. Prompt Face does not silence the microphone. It paints the muted face and sends `muted=on` or `muted=off` to OBS, where a macro can mute the audio source. The key is green while that flag is off and red while it is on. The words on the key are `Mute off` and `Mute on`. Gray means the connection is down.
 
+Mouth toggles the mouth between the camera jaw and the microphone. The key says `Jaw` or `Audio`. Jaw is blue. Audio is amber. Gray means the connection is down. This does not mute the stream. Audio opens a shared listen on the microphone. Jaw closes that listen.
+
 Prompt shows the face that is on screen. State images, set on the connection, replace the button picture for live, talking, emote, and muted. Leave a path empty and that state keeps the text.
 
 Hold emote and Toggle emote look the same. Type the face in Face text. That text is the title on the key. Hold shows it while the key is down, then clears it on release. Toggle keeps it until you press the key again. The key is amber while that face is on screen. Title font size is on the Emote title feedback. A long title stays on one line and the rest is cut off. Untick Show the face text as the key title if you want different words in Button text.
