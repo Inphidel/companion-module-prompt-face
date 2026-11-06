@@ -14,7 +14,7 @@ Hold emote and Toggle emote look the same. Type the face in Face text. That text
 
 Prompt shows the live face on one line. Font size is on the Show the prompt feedback. A long face is cut off instead of wrapping.
 
-Hat A, Hat B, Hat C, Hat D, and Hat Off choose the separate hat picture. The key turns blue while that slot is in use. The pictures are configured on the Prompt expression page.
+Hat A through Hat H, and Hat Off, choose the separate text hat. The key turns blue while that slot is in use. Each hat's left, center, and right text is configured on the Prompt expression page. The hat follows the look. Arms and hand gestures stay on the face.
 
 ## Variables
 

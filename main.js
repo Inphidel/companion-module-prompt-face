@@ -2,6 +2,14 @@ const fs = require('fs')
 const { InstanceBase, Regex, runEntrypoint, InstanceStatus, TCPHelper, combineRgb } = require('@companion-module/base')
 
 const EXPRESSION = new Set(['closed', 'open', 'wide'])
+const HAT_SLOTS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+
+function hatChoices() {
+	return [
+		...HAT_SLOTS.map((id) => ({ id, label: id.toUpperCase() })),
+		{ id: 'none', label: 'None' },
+	]
+}
 
 function fontSize(value) {
 	const number = Number(value)
@@ -270,20 +278,14 @@ class PromptFace extends InstanceBase {
 			},
 			hat: {
 				name: 'Hat',
-				description: 'Shows one saved hat picture, or hides the hat',
+				description: 'Shows one saved text hat, or hides the hat',
 				options: [
 					{
 						type: 'dropdown',
 						id: 'slot',
 						label: 'Hat',
 						default: 'none',
-						choices: [
-							{ id: 'a', label: 'A' },
-							{ id: 'b', label: 'B' },
-							{ id: 'c', label: 'C' },
-							{ id: 'd', label: 'D' },
-							{ id: 'none', label: 'None' },
-						],
+						choices: hatChoices(),
 					},
 				],
 				callback: (action) => this.send(`hat ${action.options.slot || 'none'}`),
@@ -361,13 +363,7 @@ class PromptFace extends InstanceBase {
 						id: 'slot',
 						label: 'Hat',
 						default: 'none',
-						choices: [
-							{ id: 'a', label: 'A' },
-							{ id: 'b', label: 'B' },
-							{ id: 'c', label: 'C' },
-							{ id: 'd', label: 'D' },
-							{ id: 'none', label: 'None' },
-						],
+						choices: hatChoices(),
 					},
 				],
 				callback: (feedback) =>
@@ -526,10 +522,7 @@ class PromptFace extends InstanceBase {
 				],
 				feedbacks: [{ feedbackId: 'emote_toggle', options: { show_title: true, size: 14 } }],
 			},
-			hat_a: hatPreset('A', 'a'),
-			hat_b: hatPreset('B', 'b'),
-			hat_c: hatPreset('C', 'c'),
-			hat_d: hatPreset('D', 'd'),
+			...Object.fromEntries(HAT_SLOTS.map((slot) => [`hat_${slot}`, hatPreset(slot.toUpperCase(), slot)])),
 			hat_none: hatPreset('Off', 'none'),
 			toggle: {
 				type: 'button',
